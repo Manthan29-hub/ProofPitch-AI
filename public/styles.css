@@ -4,3 +4,7 @@
 
 .evidence{grid-column:span 2}.evidence-content{display:grid;gap:8px;margin-top:14px}.evidence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.evidence-grid div{background:#1b222b;border:1px solid #2d3742;border-radius:6px;padding:9px}.evidence-grid span,.preview-panel>span{color:var(--cyan);display:block;font:8px "DM Mono",monospace;letter-spacing:.4px}.evidence-grid b{display:block;font-size:11px;margin-top:5px;overflow-wrap:anywhere}.evidence-list{margin:4px 0 0;padding-left:18px;color:#b6c0ca;font-size:10px}.evidence-list li{margin:5px 0}.preview-panel{border-top:1px solid #27303a;margin-top:16px;padding-top:14px}.preview-panel h3{font-size:14px;margin:7px 0 2px}.preview-note{color:#b6c0ca;font-size:10px;margin:0 0 9px}.preview-panel textarea{background:#11171e;border:1px solid #394754;border-radius:6px;color:#e9f0f1;min-height:72px;padding:10px;resize:vertical;width:100%}.preview-actions{align-items:center;display:flex;gap:10px;margin-top:9px}.preview-actions small{color:#8e9aa5;font-size:9px}@media(max-width:1050px){.evidence{grid-column:auto}.evidence-grid{grid-template-columns:1fr 1fr}}
 .mode-badge.error{border-color:#8b4f5f;color:#ff9aaa}
+
+/* Keep the proposal preview visible immediately on screen; print layout stays in normal flow. */
+@media screen{body.printing-proposal{overflow:hidden}body.printing-proposal>.print-view{position:fixed;inset:0;z-index:200;overflow:auto;overscroll-behavior:contain}}
+@media screen and (max-width:600px){.print-view{padding:16px}.print-view article{padding:24px}.print-view h1{font-size:28px}}

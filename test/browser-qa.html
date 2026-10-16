@@ -1,0 +1,66 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ProofPitch browser QA</title>
+<style>
+  body { margin: 0; background: #eee; font: 14px system-ui; }
+  header { background: white; padding: 8px; }
+  button { margin: 4px; padding: 8px; }
+  iframe { display: block; border: 0; width: 1440px; height: 900px; }
+  pre { white-space: pre-wrap; margin: 12px; max-width: 1250px; }
+</style>
+<header>
+  <strong>Isolated workspace QA - exact iframe CSS viewport</strong>
+  <button data-width="1440" data-height="900">Desktop 1440x900</button>
+  <button data-width="768" data-height="1024">Tablet 768x1024</button>
+  <button data-width="390" data-height="844">Mobile 390x844</button>
+  <button id="inspect">Inspect</button><span id="size"></span>
+</header>
+<iframe id="app" title="ProofPitch under test" src="/?phase1qa=20261017"></iframe>
+<pre id="results">Loading</pre>
+<script>
+// Copy this file to public/phase1-qa-temp.html only for an isolated local run.
+// Remove the public copy after QA. This is CSS viewport testing, not device emulation.
+const frame = document.getElementById('app');
+async function inspect() {
+  const probes = await Promise.all(
+    ['/health', '/api/prospects', '/api/analytics', '/app.js', '/styles.css'].map(async path => {
+      const response = await fetch(path);
+      const result = { path, status: response.status };
+      if (path === '/api/prospects' && response.ok) {
+        const rows = await response.json();
+        result.prospects = rows.map(({ id, name, status }) => ({ id, name, status }));
+      }
+      return result;
+    })
+  );
+  const win = frame.contentWindow;
+  const doc = win.document;
+  const table = doc.querySelector('.table-scroll');
+  const preview = doc.getElementById('printView');
+  const rect = preview && !preview.hidden ? preview.getBoundingClientRect() : null;
+  const report = {
+    viewport: { width: win.innerWidth, height: win.innerHeight,
+      clientWidth: doc.documentElement.clientWidth, scrollWidth: doc.documentElement.scrollWidth },
+    pageHasHorizontalOverflow: doc.documentElement.scrollWidth > doc.documentElement.clientWidth,
+    tableScroll: table ? { overflowX: win.getComputedStyle(table).overflowX,
+      clientWidth: table.clientWidth, scrollWidth: table.scrollWidth } : null,
+    proposalOverlay: rect ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+      position: win.getComputedStyle(preview).position } : null,
+    resources: win.performance.getEntriesByType('resource').map(entry => ({
+      url: entry.name, status: entry.responseStatus, type: entry.initiatorType
+    })),
+    probes
+  };
+  document.getElementById('size').textContent = win.innerWidth + ' x ' + win.innerHeight;
+  document.getElementById('results').textContent = JSON.stringify(report, null, 2);
+}
+for (const button of document.querySelectorAll('[data-width]')) {
+  button.onclick = () => {
+    frame.style.width = button.dataset.width + 'px';
+    frame.style.height = button.dataset.height + 'px';
+    setTimeout(inspect, 100);
+  };
+}
+document.getElementById('inspect').onclick = inspect;
+frame.onload = () => setTimeout(inspect, 500);
+</script>

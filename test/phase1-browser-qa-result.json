@@ -1,0 +1,119 @@
+{
+  "startingCommit": "663a5d6",
+  "date": "2026-10-17",
+  "result": "PASS: Phase 1 functional and responsive application QA",
+  "method": "Same-origin iframe with measured CSS viewport; browser console capture and PerformanceResourceTiming responseStatus plus direct same-origin GET probes. This is not top-level device emulation or native DevTools UI inspection.",
+  "runtime": {
+    "port": 3001,
+    "environment": "Windows VS Code tunnel",
+    "prospectCount": 1,
+    "fixtureId": "d33c3035-b4f6-413c-a4f5-90b9410b0ddb",
+    "status": "proposal_ready",
+    "shellAndBrowserMatch": true
+  },
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "pageHorizontalOverflow": false,
+      "proposalOverlay": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 900
+      }
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "pageHorizontalOverflow": false,
+      "tableHorizontalScroll": "contained in .table-scroll",
+      "proposalOverlay": {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 1024
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "pageHorizontalOverflow": false,
+      "tableHorizontalScroll": "contained in .table-scroll",
+      "proposalOverlay": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "workflows": {
+    "mobileNavigation": "PASS: opens and closes on navigation",
+    "emptyUrlExplicitDemo": "PASS: fixture audit and provenance",
+    "localPreview": "PASS: local meta description re-check",
+    "selectedProspectProposal": "PASS",
+    "proposalEscapeAndBack": "PASS",
+    "emptyLiveUrl": "PASS: native valueMissing validation",
+    "privateLiveHostname": "PASS: expected HTTP 400",
+    "invalidRequestsCreateNoProspects": "PASS: count remains 1"
+  },
+  "fix": {
+    "file": "public/styles.css",
+    "before": "Proposal view remained in normal flow below dashboard, off-screen after opening.",
+    "after": "Fixed scrollable screen overlay; compact mobile padding. Screen-only rules preserve print media layout."
+  },
+  "network": [
+    {
+      "path": "/styles.css",
+      "status": 200
+    },
+    {
+      "path": "/app.js",
+      "status": 200
+    },
+    {
+      "path": "/api/analytics",
+      "status": 200
+    },
+    {
+      "path": "/api/prospects",
+      "status": 200
+    },
+    {
+      "path": "/api/prospects/:id/proposal",
+      "status": 200
+    },
+    {
+      "path": "/api/audits",
+      "status": 201
+    },
+    {
+      "path": "/api/prospects/:id/preview",
+      "status": 200
+    },
+    {
+      "path": "/api/audits",
+      "status": 400
+    }
+  ],
+  "console": {
+    "applicationWarnings": 0,
+    "applicationErrors": 0,
+    "extensionErrors": "Existing chrome-extension metadata errors excluded from app failures"
+  },
+  "checks": {
+    "npmCi": "PASS on Windows after restoring missing platform command shims",
+    "tests": "14 passed",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "frontendSyntax": "PASS",
+    "qaHarnessSyntax": "PASS",
+    "diff": "PASS"
+  },
+  "limitations": [
+    "Native operating-system print dialog and print output were not inspected.",
+    "No physical-device, touch-device, or top-level device-emulation claim.",
+    "Resource status diagnostics are not a full HAR or DevTools panel capture."
+  ]
+}
