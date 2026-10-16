@@ -60,3 +60,11 @@
 - No dependency versions were changed.
 - Added deterministic coverage for fetch timeout, declared response size, content type, and redirect limits.
 - DNS rebinding remains an explicit limitation: DNS answers are validated before native `fetch`, but the connection path does not pin the validated address.
+
+## Phase 1 browser QA attempt (current checkout)
+- Starting commit: `ecd9a1b`; starting and final source working tree were clean before documentation update.
+- Isolated worker runtime: `DATABASE_PATH=/tmp/proofpitch-phase1-3000.sqlite PORT=3000 npm run dev`; worker `/health` and `/` returned HTTP 200, and worker analytics/prospects initially returned an empty workspace.
+- Worker API verification passed for explicit demo with no URL, persisted `isDemo=true` and the fixed fixture URL, local preview re-check, selected-prospect proposal, empty live URL rejection, and invalid reserved-host failure without a new prospect.
+- The built-in browser rendered a ProofPitch page at a 494px viewport, but its visible prospect rows did not match the isolated worker API, which returned zero prospects before the worker demo request. The browser was therefore stale or connected to a different local runtime/database.
+- Desktop 1440x900 and tablet 768x1024 browser views were not verified. Browser console and network panels were not available through the supported controls. Full browser click-through, print-dialog inspection, and same-runtime persistence comparison are blocked by this namespace/data mismatch.
+- `https://example.com` live audit was attempted only through the isolated worker; worker DNS resolution was unavailable and returned `Host could not be resolved`. No client website was contacted.
