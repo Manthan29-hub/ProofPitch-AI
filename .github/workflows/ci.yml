@@ -19,9 +19,11 @@ jobs:
 
       - name: Build Docker image
         run: docker build --tag proofpitch-ai:ci .
+      - name: Run complete tests in offline container
+        run: docker run --rm --network none proofpitch-ai:ci npm test
       - name: Run offline container smoke test
         run: |
-          docker run --detach --name proofpitch-ci -p 3000:3000 proofpitch-ai:ci
+          docker run --detach --network none --name proofpitch-ci -p 3000:3000 proofpitch-ai:ci
           trap 'docker logs proofpitch-ci; docker rm -f proofpitch-ci' EXIT
           for attempt in {1..20}; do
             if curl --fail --silent http://127.0.0.1:3000/health; then exit 0; fi

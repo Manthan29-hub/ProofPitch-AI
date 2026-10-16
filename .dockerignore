@@ -1,0 +1,10 @@
+node_modules
+dist
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.env
+.git
+.github
+.opencode
+.omnirush

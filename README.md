@@ -15,7 +15,7 @@ make build
 npm run dev
 ```
 
-Open http://localhost:3000. Enter a public HTTP(S) website URL. Live audit failures remain visible and do not create partial leads. For an offline rehearsal, explicitly select the named demo fixture; its provenance is persisted and excluded from real audit analytics.
+Open http://localhost:3000. Enter a public HTTP(S) website URL. Live audit failures remain visible and do not create partial leads. For an offline rehearsal, explicitly select the named demo fixture; its provenance is persisted and excluded from real audit analytics. The local fix preview can re-check a missing meta description, but it never changes or claims to change the live website.
 
 ## Commands
 
@@ -32,7 +32,8 @@ Copy `.env.example` to `.env` only if you need to override the port or database 
 
 ```bash
 docker build -t proofpitch-ai .
-docker run --rm -p 3000:3000 -e DATABASE_PATH=/app/data/proofpitch.sqlite proofpitch-ai
+docker run --rm --network none proofpitch-ai npm test
+docker run --rm --network none -p 3000:3000 -e DATABASE_PATH=/app/data/proofpitch.sqlite proofpitch-ai
 ```
 
 For persistent Docker data, mount a local directory at `/app/data`.

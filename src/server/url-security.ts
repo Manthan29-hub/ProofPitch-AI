@@ -1,46 +1,41 @@
 import dns from "node:dns/promises";
 import net from "node:net";
 
-export class UnsafeUrlError extends Error { constructor(message: string) { super(message); this.name = "UnsafeUrlError"; } }
-
-function privateIp(ip: string): boolean {
+export type DnsLookup = (hostname: string, options: { all: true }) => Promise<Array<{ address: string; family: number }>>;
+export type SecurityEvidence = { rule: "scheme" | "credentials" | "hostname" | "ip" | "dns" | "redirect" | "timeout" | "content-type" | "status" | "size" | "connection"; value: string; url: string };
+export class UnsafeUrlError extends Error { readonly evidence: SecurityEvidence; constructor(message: string, evidence: SecurityEvidence) { super(message); this.name = "UnsafeUrlError"; this.evidence = evidence; } }
+const safeValue = (value: string) => value.replace(/[\u0000-\u001f\u007f]/g, " ").slice(0, 180);
+const evidence = (rule: SecurityEvidence["rule"], value: string, url: URL): SecurityEvidence => ({ rule, value: safeValue(value), url: `${url.protocol}//${url.hostname}${url.port ? `:${url.port}` : ""}${url.pathname}` });
+export function isPrivateIp(ip: string): boolean {
   const normalized = ip.toLowerCase().replace(/^\[|\]$/g, "");
-  if (net.isIPv4(normalized)) { const [a, b] = normalized.split(".").map(Number); return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168); }
-  if (net.isIPv6(normalized)) {
-    const mapped = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+|[0-9a-f]{1,4}:[0-9a-f]{1,4})$/i);
-    if (mapped) { const dotted = mapped[1].includes(".") ? mapped[1] : `${parseInt(mapped[1].split(":")[0], 16) >> 8}.${parseInt(mapped[1].split(":")[0], 16) & 255}.${parseInt(mapped[1].split(":")[1], 16) >> 8}.${parseInt(mapped[1].split(":")[1], 16) & 255}`; return privateIp(dotted); }
-    return normalized === "::1" || normalized === "::" || normalized.startsWith("fc") || normalized.startsWith("fd") || normalized.startsWith("fe80:") || normalized.startsWith("fec0:");
-  }
-  return net.isIP(normalized) !== 0;
+  if (net.isIPv4(normalized)) { const [a, b, c] = normalized.split(".").map(Number); return a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 0 && c === 0) || (a === 192 && b === 0 && c === 2) || (a === 192 && b === 168) || (a === 198 && b >= 18 && b <= 19) || (a === 198 && b === 51 && c === 100) || (a === 203 && b === 0 && c === 113) || a >= 224; }
+  if (net.isIPv6(normalized)) { if (normalized.startsWith("::ffff:")) { const tail = normalized.slice(7); if (net.isIPv4(tail)) return isPrivateIp(tail); const mapped = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(tail); if (mapped) { const a = parseInt(mapped[1], 16), b = parseInt(mapped[2], 16); return isPrivateIp(`${a >> 8}.${a & 255}.${b >> 8}.${b & 255}`); } } return normalized === "::" || normalized === "::1" || normalized.startsWith("fc") || normalized.startsWith("fd") || normalized.startsWith("fe8") || normalized.startsWith("fe9") || normalized.startsWith("fea") || normalized.startsWith("feb") || normalized.startsWith("fec") || normalized.startsWith("fed") || normalized.startsWith("fee") || normalized.startsWith("fef") || normalized.startsWith("ff"); }
+  return true;
 }
-
-export async function validatePublicUrl(input: string): Promise<URL> {
-  let url: URL; try { url = new URL(input); } catch { throw new UnsafeUrlError("A valid URL is required"); }
-  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || !url.hostname) throw new UnsafeUrlError("Only public HTTP(S) URLs are allowed");
-  const host = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
-  if (host === "localhost" || host.endsWith(".localhost") || host === "metadata.google.internal" || privateIp(host)) throw new UnsafeUrlError("Private or local hosts are not allowed");
-  try { const records = await dns.lookup(host, { all: true }); if (!records.length || records.some(r => privateIp(r.address))) throw new UnsafeUrlError("URL resolves to a private or local address"); }
-  catch (e) { if (e instanceof UnsafeUrlError) throw e; throw new UnsafeUrlError("Host could not be resolved"); }
+const defaultLookup: DnsLookup = (hostname, options) => dns.lookup(hostname, options);
+export async function validatePublicUrl(input: string, options: { lookup?: DnsLookup } = {}): Promise<URL> {
+  let url: URL; try { url = new URL(input); } catch { throw new UnsafeUrlError("A valid URL is required", { rule: "hostname", value: "invalid URL", url: "about:blank" }); }
+  const base = evidence("scheme", input, url);
+  if (!["http:", "https:"].includes(url.protocol)) throw new UnsafeUrlError("Only public HTTP(S) URLs are allowed", { ...base, rule: "scheme", value: url.protocol });
+  if (url.username || url.password) throw new UnsafeUrlError("URL credentials are not allowed", { ...base, rule: "credentials", value: "credentials present" });
+  const host = url.hostname.replace(/^\[|\]$/g, "").replace(/\.$/, "").toLowerCase();
+  if (!host || host === "localhost" || host.endsWith(".localhost") || host === "metadata.google.internal" || (net.isIP(host) !== 0 && isPrivateIp(host))) throw new UnsafeUrlError("Private or local hosts are not allowed", { ...base, rule: "hostname", value: host || "missing hostname" });
+  try { const records = await (options.lookup ?? defaultLookup)(host, { all: true }); if (!records.length || records.some(r => isPrivateIp(r.address))) throw new UnsafeUrlError("URL resolves to a private or local address", { ...base, rule: "ip", value: records.map(r => r.address).join(", ") || "no addresses" }); }
+  catch (error) { if (error instanceof UnsafeUrlError) throw error; throw new UnsafeUrlError("Host could not be resolved", { ...base, rule: "dns", value: "resolution failed" }); }
   return url;
 }
-
-export async function safeFetch(input: string, options: { timeoutMs?: number; maxBytes?: number; fetchImpl?: typeof fetch } = {}) {
-  const fetchImpl = options.fetchImpl ?? fetch, maxBytes = options.maxBytes ?? 1_000_000;
-  let url = await validatePublicUrl(input);
+export async function safeFetch(input: string, options: { timeoutMs?: number; maxBytes?: number; fetchImpl?: typeof fetch; lookup?: DnsLookup } = {}) {
+  const fetchImpl = options.fetchImpl ?? fetch, maxBytes = options.maxBytes ?? 1_000_000; let url = await validatePublicUrl(input, { lookup: options.lookup }); const deadline = Date.now() + (options.timeoutMs ?? 8000);
   for (let redirects = 0; redirects <= 3; redirects++) {
-    const controller = new AbortController(), timer = setTimeout(() => controller.abort(), options.timeoutMs ?? 8000);
-    try {
-      const response = await fetchImpl(url, { redirect: "manual", signal: controller.signal, headers: { accept: "text/html,application/xhtml+xml" } });
-      if ([301, 302, 303, 307, 308].includes(response.status)) { const location = response.headers.get("location"); if (!location) throw new Error("Redirect has no destination"); url = await validatePublicUrl(new URL(location, url).toString()); continue; }
+    const remaining = Math.max(1, deadline - Date.now()), controller = new AbortController(), timer = setTimeout(() => controller.abort(), remaining);
+    try { const response = await fetchImpl(url, { redirect: "manual", signal: controller.signal, headers: { accept: "text/html,application/xhtml+xml" } });
+      if ([301, 302, 303, 307, 308].includes(response.status)) { const location = response.headers.get("location"); if (!location) throw new Error("Redirect has no destination"); url = await validatePublicUrl(new URL(location, url).toString(), { lookup: options.lookup }); continue; }
       if (response.status < 200 || response.status >= 300) throw new Error(`Audit target returned HTTP ${response.status}`);
-      const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
-      if (contentType && !contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) throw new Error("Audit target did not return HTML");
-      const reader = response.body?.getReader();
-      if (!reader) { const body = await response.text(); if (new TextEncoder().encode(body).byteLength > maxBytes) throw new Error("Response exceeded size limit"); return { url, status: response.status, body }; }
-      const chunks: Uint8Array[] = []; let size = 0;
-      while (true) { const part = await reader.read(); if (part.done) break; size += part.value.byteLength; if (size > maxBytes) throw new Error("Response exceeded size limit"); chunks.push(part.value); }
-      return { url, status: response.status, body: new TextDecoder().decode(Buffer.concat(chunks)) };
-    } finally { clearTimeout(timer); }
+      const contentType = response.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase(); if (!contentType || !["text/html", "application/xhtml+xml"].includes(contentType)) throw new Error("Audit target did not return HTML");
+      const declared = Number(response.headers.get("content-length") ?? 0); if (declared > maxBytes) throw new Error("Response exceeded size limit");
+      const reader = response.body?.getReader(); if (!reader) { const body = await response.text(); if (Buffer.byteLength(body) > maxBytes) throw new Error("Response exceeded size limit"); return { url, status: response.status, body }; }
+      const chunks: Uint8Array[] = []; let size = 0; while (true) { const part = await reader.read(); if (part.done) break; size += part.value.byteLength; if (size > maxBytes) { await reader.cancel(); throw new Error("Response exceeded size limit"); } chunks.push(part.value); } return { url, status: response.status, body: new TextDecoder().decode(Buffer.concat(chunks)) };
+    } catch (error) { if ((error as Error).name === "AbortError") throw new Error("Audit request timed out"); throw error; } finally { clearTimeout(timer); }
   }
   throw new Error("Too many redirects");
 }

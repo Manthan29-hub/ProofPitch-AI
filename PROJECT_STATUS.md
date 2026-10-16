@@ -14,7 +14,7 @@
 
 ## Actual verification results
 - `npm ci` — passed; 46 packages audited, 0 vulnerabilities reported.
-- `make test` — passed: TypeScript typecheck plus 4 offline Node tests.
+- `make test` — passed: TypeScript typecheck plus 7 offline Node tests.
 - `make build` — passed: production TypeScript compilation.
 - `node --check public/app.js` — passed.
 - Runtime smoke test — passed: `/health`, static frontend serving, and offline audit API creation.
@@ -32,10 +32,15 @@
 - [x] Relative paths and ignored local database files
 - [x] Tests independent of live external APIs
 - [x] GitHub Actions CI workflow runs install, test, and build
-- [x] Docker build/run verified on GitHub-hosted Linux runner via CI run 38926438928
+- [ ] Docker build/run verification for this change — pending the next GitHub Actions run with networking disabled
 
 ## Remaining blockers / limitations
 - Public GitHub repository: https://github.com/Manthan29-hub/ProofPitch-AI
 - CI run 38926438928 passed tests, production build, Docker image build, and offline container health check.
 - Local Docker CLI is unavailable, but Docker verification completed successfully on the GitHub-hosted Linux runner.
 - Authentication, team workspaces, branded white-label output, and payment infrastructure are intentionally outside this offline MVP.
+
+## Current flow verification
+- Explicit demo audit → evidence inspector → local missing-meta-description preview and re-check → selected prospect proposal → in-page print view are implemented.
+- Live failures remain errors; they do not silently become demo results.
+- DNS lookup is injectable for offline tests. The current native `fetch` path still cannot guarantee DNS-rebinding resistance because it may resolve a hostname again at connection time; this is documented and not claimed as solved.
