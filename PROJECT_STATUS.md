@@ -1,16 +1,36 @@
 # ProofPitch AI status
 
-## Verified
-- Deterministic, evidence-backed HTML audits with URL validation, timeout, redirect, size, and SSRF protections.
-- SQLite persistence for prospects, audit history, pipeline transitions, analytics, and proposal inputs.
-- Responsive dashboard UI with audit workflow and offline fallback clearly labeled.
-- TypeScript build and offline tests pass.
+## Verified MVP
+- Responsive dark graphite dashboard with turquoise/violet visual system and mobile navigation.
+- Website audit workflow uses deterministic HTML parsing for title, description, H1s, links, images, alt text, word count, and prioritized recommendations.
+- URL safety includes HTTP(S)-only validation, credential rejection, private/local host rejection, validated redirects, timeout, and response-size limits.
+- SQLite persists prospects, audit history, pipeline transitions, analytics, and proposal inputs.
+- API-first audit flow creates and updates prospects; unavailable live sites fall back to an explicitly labeled offline fixture.
+- Proposal data is generated from stored audit evidence and the dashboard print action opens a printable proposal suitable for PDF export.
+- No unsolicited messaging or contact scraping is implemented.
 
-## Checks
-- `make test`
-- `make build`
-- `node --check public/app.js`
+## Actual verification results
+- `npm ci` — passed; 46 packages audited, 0 vulnerabilities reported.
+- `make test` — passed: TypeScript typecheck plus 4 offline Node tests.
+- `make build` — passed: production TypeScript compilation.
+- `node --check public/app.js` — passed.
+- Runtime smoke test — passed: `/health`, static frontend serving, and offline audit API creation.
+- Secret scan — passed: no `.env` private files, API keys, passwords, tokens, or credential assignments detected in tracked source.
+- Git review — passed: two meaningful commits, clean working tree.
 
-## Remaining MVP polish
-- Proposal PDF export is represented by structured proposal data; add a PDF renderer if a downloadable artifact is required.
-- Replace placeholder workspace identity and sample copy with user settings when authentication is introduced.
+## Buildathon rebuildability checklist
+- [x] Git repository with meaningful commits
+- [x] `package-lock.json` dependency lockfile
+- [x] Pinned runtime in `.nvmrc`
+- [x] Dockerfile included
+- [x] Single documented offline test command (`make test`)
+- [x] README setup, run, test, Docker, configuration, and troubleshooting steps
+- [x] Safe `.env.example` with placeholders only
+- [x] Relative paths and ignored local database files
+- [x] Tests independent of live external APIs
+- [ ] Docker build/run verified — Docker CLI is not installed in this environment; Dockerfile was reviewed but not executed
+
+## Remaining blockers / limitations
+- No GitHub remote is configured and nothing has been pushed. Publishing requires the user to provide/approve a remote and push command.
+- Docker verification requires a machine with Docker installed.
+- Authentication, team workspaces, branded white-label output, and payment infrastructure are intentionally outside this offline MVP.
