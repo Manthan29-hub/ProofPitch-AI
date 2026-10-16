@@ -29,9 +29,10 @@
 - [x] Relative paths and ignored local database files
 - [x] Tests independent of live external APIs
 - [x] GitHub Actions CI workflow runs install, test, and build
-- [ ] Docker build/run verified — Docker CLI is not installed in this environment; Dockerfile was reviewed but not executed
+- [x] Docker build/run verified on GitHub-hosted Linux runner via CI run 38926438928
 
 ## Remaining blockers / limitations
-- No GitHub remote is configured and nothing has been pushed. Publishing requires the user to provide/approve a remote and push command.
-- Docker verification requires a machine with Docker installed.
+- Public GitHub repository: https://github.com/Manthan29-hub/ProofPitch-AI
+- CI run 38926438928 passed tests, production build, Docker image build, and offline container health check.
+- Local Docker CLI is unavailable, but Docker verification completed successfully on the GitHub-hosted Linux runner.
 - Authentication, team workspaces, branded white-label output, and payment infrastructure are intentionally outside this offline MVP.
