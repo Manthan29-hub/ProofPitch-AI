@@ -47,3 +47,9 @@
 
 ## Browser verification note
 - The built-in browser could not open the local server in this environment, so desktop/mobile layout and browser console checks remain unverified. Static viewport/media-query inspection and API flow smoke tests passed.
+
+## Visual QA attempt
+- The worker server was started with `npm run dev` and verified locally: `GET /health` returned 200 and `/` returned 200.
+- The built-in browser rendered a ProofPitch page at a 480px viewport, but its DOM showed stale persisted prospect rows that did not match the isolated worker database or current HTML response. This indicates the browser tab was not observing the same runtime/network namespace.
+- Desktop viewport, browser console, and browser network failures remain unverified; no visual pass is claimed.
+- Reproducible source fixes made during QA: removed external Google Fonts requests for offline cleanliness, made demo URL validation conditional, cleared static placeholder prospect rows, fixed tablet evidence grid behavior, fixed Escape print cleanup, and corrected table markup.
