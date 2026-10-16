@@ -13,8 +13,9 @@
 - Added regression coverage for valid hostnames, mapped IPv6, HTTP/content-type failures, parser visibility, and demo/proposal persistence.
 
 ## Actual verification results
-- `npm ci` — passed; 46 packages audited, 0 vulnerabilities reported.
-- `make test` — passed: TypeScript typecheck plus 9 offline Node tests.
+- `npm ci` — passed on Linux; 46 packages audited, 0 vulnerabilities reported.
+- Supported runtime documented as Node.js 22.23.0; Node.js 24 is not claimed supported because `better-sqlite3` is native.
+- `make test` — passed: TypeScript typecheck plus 11 offline Node tests.
 - `make build` — passed: production TypeScript compilation.
 - `node --check public/app.js` — passed.
 - Runtime smoke test — passed: `/health`, static frontend serving, and offline audit API creation.
@@ -53,3 +54,9 @@
 - The built-in browser rendered a ProofPitch page at a 480px viewport, but its DOM showed stale persisted prospect rows that did not match the isolated worker database or current HTML response. This indicates the browser tab was not observing the same runtime/network namespace.
 - Desktop viewport, browser console, and browser network failures remain unverified; no visual pass is claimed.
 - Reproducible source fixes made during QA: removed external Google Fonts requests for offline cleanliness, made demo URL validation conditional, cleared static placeholder prospect rows, fixed tablet evidence grid behavior, fixed Escape print cleanup, and corrected table markup.
+
+## Runtime and release notes
+- Windows setup now documents nvm-windows, exact Node.js 22.23.0 selection, clean `npm ci`, and native `better-sqlite3` troubleshooting.
+- No dependency versions were changed.
+- Added deterministic coverage for fetch timeout, declared response size, content type, and redirect limits.
+- DNS rebinding remains an explicit limitation: DNS answers are validated before native `fetch`, but the connection path does not pin the validated address.

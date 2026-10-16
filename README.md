@@ -6,7 +6,7 @@ ProofPitch AI is an offline-friendly revenue workspace for freelancers and agenc
 
 ## Quick start
 
-Requirements: Node.js 22 (see `.nvmrc`). No paid service or API key is required.
+Requirements: Node.js **22.23.0** (the version in `.nvmrc`). Node.js 24 is not currently a supported/tested runtime because `better-sqlite3` is a native module. No paid service or API key is required.
 
 ```bash
 npm ci
@@ -18,6 +18,28 @@ npm run dev
 Open http://localhost:3000. Enter a public HTTP(S) website URL. Live audit failures remain visible and do not create partial leads. For an offline rehearsal, explicitly select the named demo fixture; its provenance is persisted and excluded from real audit analytics. The local fix preview can re-check a missing meta description, but it never changes or claims to change the live website.
 
 ## Commands
+
+### Windows setup
+
+Using [nvm-windows](https://github.com/coreybutler/nvm-windows) is recommended:
+
+```powershell
+nvm install 22.23.0
+nvm use 22.23.0
+node --version
+```
+
+The final command should print `v22.23.0`. From PowerShell, perform a clean dependency installation:
+
+```powershell
+Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue
+npm ci
+npm run typecheck
+npm test
+```
+
+`npm ci` uses the committed lockfile. Do not use `npm install` for the initial setup because it may change the lockfile. If using Git Bash or WSL, `make test` is equivalent to the npm checks above.
+
 
 - `make test` — typecheck and run the offline Node test suite.
 - `make build` — compile the TypeScript server.
@@ -52,5 +74,7 @@ Audit requests accept only HTTP(S), reject credentials, localhost, private/link-
 ## Troubleshooting
 
 - If port 3000 is busy, run `PORT=3100 npm run dev`.
-- If a URL cannot be audited, verify it is public, uses HTTP(S), and responds within the timeout; use the offline fallback for demos.
+- If `better-sqlite3`, `prebuild-install`, or `node-gyp` fails during installation, check `node --version`. Switch to Node.js 22.23.0, remove `node_modules`, and rerun `npm ci`. Node.js 24 is not currently supported/tested for this project. If native compilation is still required on Windows, install Visual Studio Build Tools with the **Desktop development with C++** workload and Python, then retry the clean install.
+- If a URL cannot be audited, verify it is public, uses HTTP(S), and responds within the timeout; explicitly select the named offline fixture for demos.
+- DNS is validated before fetching, but the current native fetch path does not pin the validated address at connection time; DNS rebinding protection is not claimed.
 - Delete the ignored `proofpitch.sqlite` file to reset local data.

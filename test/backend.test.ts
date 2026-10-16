@@ -10,3 +10,19 @@ test("parser ignores non-visible text and requires a real alt attribute",()=>{co
 
 test("mixed DNS answers and unsafe redirects fail before fetch",async()=>{const lookup=async(host:string)=>host==="example.com"?[{address:"93.184.216.34",family:4},{address:"192.168.1.2",family:4}]:[{address:"93.184.216.34",family:4}];await assert.rejects(validatePublicUrl("https://example.com",{lookup}),/private|local/);const fetchImpl=async()=>new Response(null,{status:302,headers:{location:"http://127.0.0.1/"}});await assert.rejects(safeFetch("https://example.com",{lookup:async()=>[{address:"93.184.216.34",family:4}],fetchImpl:fetchImpl as typeof fetch}),/Private|local/);});
 test("local meta preview is bounded and explicitly non-deploying",()=>{const result=previewMetaDescription(demoAudit(),"A concise demo description.");assert.equal(result.kind,"local-preview");assert.equal(result.recheck.recommendationResolved,true);assert.throws(()=>previewMetaDescription(demoAudit(),"x".repeat(161)),/1-160/);});
+
+test("safeFetch enforces HTML content types, declared size, and redirect limits",async()=>{
+  const lookup=async()=>[{address:"93.184.216.34",family:4}];
+  const response=(status:number,type:string,body="ok",headers:Record<string,string>={})=>new Response(body,{status,headers:{"content-type":type,...headers}});
+  await assert.rejects(safeFetch("https://example.com",{lookup,fetchImpl:(async()=>response(200,"text/html","ok",{"content-length":"99"})) as typeof fetch,maxBytes:10}),/size limit/);
+  await assert.rejects(safeFetch("https://example.com",{lookup,fetchImpl:(async()=>response(200,"text/plain")) as typeof fetch}),/did not return HTML/);
+  let calls=0;
+  await assert.rejects(safeFetch("https://example.com",{lookup,fetchImpl:(async()=>{calls++;return new Response(null,{status:302,headers:{location:"https://example.com/next"}})}) as typeof fetch}),/Too many redirects/);
+  assert.equal(calls,4);
+});
+
+test("safeFetch converts an abort into a stable timeout error",async()=>{
+  const lookup=async()=>[{address:"93.184.216.34",family:4}];
+  const fetchImpl=(async(_input:RequestInfo,init?:RequestInit)=>await new Promise<Response>((_,reject)=>{init?.signal?.addEventListener("abort",()=>reject(Object.assign(new Error("aborted"),{name:"AbortError"})));})) as typeof fetch;
+  await assert.rejects(safeFetch("https://example.com",{lookup,fetchImpl,timeoutMs:5}),/timed out/);
+});
