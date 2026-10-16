@@ -8,6 +8,9 @@
 - API-first audit flow creates and updates prospects; unavailable live sites fall back to an explicitly labeled offline fixture.
 - Proposal data is generated from stored audit evidence and the dashboard print action opens a printable proposal suitable for PDF export.
 - No unsolicited messaging or contact scraping is implemented.
+- Live failures remain errors; offline demos require explicit selection and persist `isDemo` provenance.
+- Frontend untrusted data is rendered with text nodes, and proposal printing uses an in-page printable view.
+- Added regression coverage for valid hostnames, mapped IPv6, HTTP/content-type failures, parser visibility, and demo/proposal persistence.
 
 ## Actual verification results
 - `npm ci` — passed; 46 packages audited, 0 vulnerabilities reported.

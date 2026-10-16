@@ -15,7 +15,7 @@ make build
 npm run dev
 ```
 
-Open http://localhost:3000. Enter a public HTTP(S) website URL. If the site is unavailable, the UI creates a clearly labeled offline audit fixture so the core workflow remains demonstrable.
+Open http://localhost:3000. Enter a public HTTP(S) website URL. Live audit failures remain visible and do not create partial leads. For an offline rehearsal, explicitly select the named demo fixture; its provenance is persisted and excluded from real audit analytics.
 
 ## Commands
 
@@ -39,7 +39,7 @@ For persistent Docker data, mount a local directory at `/app/data`.
 
 ## Safety and limitations
 
-Audit requests accept only HTTP(S), reject credentials, localhost, private/link-local/metadata destinations, validate redirects, enforce timeouts and response limits, and parse only returned HTML. The product does not scrape contacts or send outreach. AI-style recommendations are generated from observed deterministic findings; they are suggestions, not claims about business facts. Prices, revenue, and estimates must be supplied by the user before sending a proposal.
+Audit requests accept only HTTP(S), reject credentials, localhost, private/link-local/metadata destinations, validate redirects, enforce timeouts and response limits, reject HTTP errors and non-HTML responses, and parse only returned HTML. The product does not scrape contacts or send outreach. AI-style recommendations are generated from observed deterministic findings; they are suggestions, not claims about business facts. Prices, revenue, and estimates must be supplied by the user before sending a proposal.
 
 ## Architecture
 
