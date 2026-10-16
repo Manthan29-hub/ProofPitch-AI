@@ -76,5 +76,6 @@ Audit requests accept only HTTP(S), reject credentials, localhost, private/link-
 - If port 3000 is busy, run `PORT=3100 npm run dev`.
 - If `better-sqlite3`, `prebuild-install`, or `node-gyp` fails during installation, check `node --version`. Switch to Node.js 22.23.0, remove `node_modules`, and rerun `npm ci`. Node.js 24 is not currently supported/tested for this project. If native compilation is still required on Windows, install Visual Studio Build Tools with the **Desktop development with C++** workload and Python, then retry the clean install.
 - If a URL cannot be audited, verify it is public, uses HTTP(S), and responds within the timeout; explicitly select the named offline fixture for demos.
-- DNS is validated before fetching, but the current native fetch path does not pin the validated address at connection time; DNS rebinding protection is not claimed.
+- Production audits resolve DNS once, reject unsafe answers, and connect through a validated-address lookup while preserving the original hostname for HTTP/TLS. Redirect destinations are independently revalidated. The injected fetch path is test-only; DNS-rebinding protection is claimed only for the production transport.
+- Audit requests are rate-limited per client address by default to 10 requests per 60 seconds. Configure `AUDIT_RATE_LIMIT` and `AUDIT_RATE_WINDOW_MS` for local deployments.
 - Delete the ignored `proofpitch.sqlite` file to reset local data.

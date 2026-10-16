@@ -15,7 +15,8 @@
 ## Actual verification results
 - `npm ci` — passed on Linux; 46 packages audited, 0 vulnerabilities reported.
 - Supported runtime documented as Node.js 22.23.0; Node.js 24 is not claimed supported because `better-sqlite3` is native.
-- `make test` — passed: TypeScript typecheck plus 11 offline Node tests.
+- `npm ci` — passed on Linux; 46 packages installed/audited.
+- `make test` — passed: TypeScript typecheck plus 14 offline Node tests.
 - `make build` — passed: production TypeScript compilation.
 - `node --check public/app.js` — passed.
 - Runtime smoke test — passed: `/health`, static frontend serving, and offline audit API creation.
@@ -59,7 +60,7 @@
 - Windows setup now documents nvm-windows, exact Node.js 22.23.0 selection, clean `npm ci`, and native `better-sqlite3` troubleshooting.
 - No dependency versions were changed.
 - Added deterministic coverage for fetch timeout, declared response size, content type, and redirect limits.
-- DNS rebinding remains an explicit limitation: DNS answers are validated before native `fetch`, but the connection path does not pin the validated address.
+- Phase 2 production transport now pins the validated DNS address through the Node HTTP(S) lookup callback while preserving the original hostname for Host/SNI; redirects repeat validation. The test-only injected fetch seam does not model socket pinning.
 
 ## Phase 1 browser QA attempt (current checkout)
 - Starting commit: `ecd9a1b`; starting and final source working tree were clean before documentation update.
@@ -68,3 +69,11 @@
 - The built-in browser rendered a ProofPitch page at a 494px viewport, but its visible prospect rows did not match the isolated worker API, which returned zero prospects before the worker demo request. The browser was therefore stale or connected to a different local runtime/database.
 - Desktop 1440x900 and tablet 768x1024 browser views were not verified. Browser console and network panels were not available through the supported controls. Full browser click-through, print-dialog inspection, and same-runtime persistence comparison are blocked by this namespace/data mismatch.
 - `https://example.com` live audit was attempted only through the isolated worker; worker DNS resolution was unavailable and returned `Host could not be resolved`. No client website was contacted.
+
+## Phase 2 Security and Reliability
+- `make test`, `make build`, `node --check public/app.js`, and `git diff --check` all passed after Phase 2 changes.
+- Docker checks were blocked locally because `docker --version` returned `command not found`.
+- Production audit fetch now connects only through the validated public DNS address, with original-hostname HTTP/TLS semantics preserved. Redirect targets are resolved and pinned independently.
+- Added bounded per-client audit rate limiting with configurable `AUDIT_RATE_LIMIT` and `AUDIT_RATE_WINDOW_MS`; invalid configuration falls back to safe defaults.
+- Added regression coverage for public IPv6, reserved/multicast ranges, rate limiting, timeout, response size, content type, redirects, and explicit demo/live URL behavior.
+- No real customer websites or production databases were used for Phase 2 tests.

@@ -28,3 +28,11 @@ test("safeFetch converts an abort into a stable timeout error",async()=>{
 });
 
 test("HTTP audit route allows empty URL only for explicit demo",async()=>{const server=http.createServer(createApp(new Store()));await new Promise<void>(resolve=>server.listen(0,resolve));const address=server.address();if(!address||typeof address==="string")throw Error("server did not bind");const base=`http://127.0.0.1:${address.port}`;try{const demo=await fetch(`${base}/api/audits`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({demo:true})});assert.equal(demo.status,201);const demoBody=await demo.json() as any;assert.equal(demoBody.audit.isDemo,true);assert.equal(demoBody.prospect.website,"https://demo.proofpitch.local/");const live=await fetch(`${base}/api/audits`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({})});assert.equal(live.status,400);assert.match((await live.json() as any).error,/url is required/);}finally{server.close();}});
+
+test("URL policy accepts public IPv4/IPv6 and rejects reserved ranges",async()=>{
+  const publicLookup=async()=>[{address:"2001:4860:4860::8888",family:6}];
+  assert.equal((await validatePublicUrl("https://example.com",{lookup:publicLookup})).hostname,"example.com");
+  for (const address of ["0.0.0.0","100.64.0.1","198.18.0.1","224.0.0.1","::","ff02::1","fc00::1","fe80::1"]) await assert.rejects(validatePublicUrl("https://example.com",{lookup:async()=>[{address,family:address.includes(":")?6:4}]}),UnsafeUrlError);
+});
+
+test("audit endpoint applies a bounded per-client rate limit",async()=>{const server=http.createServer(createApp(new Store(),{auditRateLimit:{max:1,windowMs:60_000}}));await new Promise<void>(resolve=>server.listen(0,resolve));const address=server.address();if(!address||typeof address==="string")throw Error("server did not bind");const base=`http://127.0.0.1:${address.port}`;try{const payload={demo:true};const first=await fetch(`${base}/api/audits`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});assert.equal(first.status,201);const second=await fetch(`${base}/api/audits`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)});assert.equal(second.status,429);assert.match((await second.json() as any).error,/rate limit/i);}finally{server.close();}});
