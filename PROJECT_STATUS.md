@@ -77,3 +77,10 @@
 - Added bounded per-client audit rate limiting with configurable `AUDIT_RATE_LIMIT` and `AUDIT_RATE_WINDOW_MS`; invalid configuration falls back to safe defaults.
 - Added regression coverage for public IPv6, reserved/multicast ranges, rate limiting, timeout, response size, content type, redirects, and explicit demo/live URL behavior.
 - No real customer websites or production databases were used for Phase 2 tests.
+
+## Phase 1 browser QA follow-up (2026-10-17)
+- The isolated app was opened in a fresh VS Code tunnel browser tab at port 3001; the dashboard showed LIVE DATA and the persisted ProofPitch demo fixture from the isolated database.
+- Same-runtime browser workflows passed: explicit demo audit without a URL, findings and demo provenance, local preview re-check, selected-prospect proposal view and Escape close, empty live URL validation, and rejection of a localhost URL without creating a live prospect.
+- Desktop visual review passed at the observed 1363x936 browser viewport. An earlier partial mobile rendering was observed at 494x707.
+- Exact 1440x900, 768x1024, and 390x844 viewport checks remain unverified. The available browser control surface does not expose viewport resizing or browser DevTools console/network inspection, so those checks remain blocked.
+- Phase 1 should not be marked fully complete until the exact viewport matrix and console/network inspection are completed.
