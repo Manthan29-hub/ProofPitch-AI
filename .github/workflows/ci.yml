@@ -23,10 +23,10 @@ jobs:
         run: docker run --rm --network none proofpitch-ai:ci npm test
       - name: Run offline container smoke test
         run: |
-          docker run --detach --network none --name proofpitch-ci -p 3000:3000 proofpitch-ai:ci
+          docker run --detach --network none --name proofpitch-ci proofpitch-ai:ci
           trap 'docker logs proofpitch-ci; docker rm -f proofpitch-ci' EXIT
           for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:3000/health; then exit 0; fi
+            if docker exec proofpitch-ci node -e "fetch('http://127.0.0.1:3000/health').then(r => { if (!r.ok) process.exit(1); return r.text(); }).then(console.log).catch(() => process.exit(1))"; then exit 0; fi
             sleep 1
           done
           exit 1
