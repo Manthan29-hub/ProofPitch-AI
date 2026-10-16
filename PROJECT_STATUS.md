@@ -28,6 +28,7 @@
 - [x] Safe `.env.example` with placeholders only
 - [x] Relative paths and ignored local database files
 - [x] Tests independent of live external APIs
+- [x] GitHub Actions CI workflow runs install, test, and build
 - [ ] Docker build/run verified — Docker CLI is not installed in this environment; Dockerfile was reviewed but not executed
 
 ## Remaining blockers / limitations
