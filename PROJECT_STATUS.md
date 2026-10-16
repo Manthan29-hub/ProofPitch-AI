@@ -84,3 +84,12 @@
 - Desktop visual review passed at the observed 1363x936 browser viewport. An earlier partial mobile rendering was observed at 494x707.
 - Exact 1440x900, 768x1024, and 390x844 viewport checks remain unverified. The available browser control surface does not expose viewport resizing or browser DevTools console/network inspection, so those checks remain blocked.
 - Phase 1 should not be marked fully complete until the exact viewport matrix and console/network inspection are completed.
+
+## Phase 1 exact viewport QA attempt (current checkpoint)
+- Starting commit: `177c9ae`; starting working tree contained a pre-existing `PROJECT_STATUS.md` modification and was not reset or discarded.
+- Isolated server setup: `DATABASE_PATH=/tmp/proofpitch-phase1-current.sqlite PORT=3001 npm run dev`. After a platform-mismatched native dependency was repaired with a clean local `npm ci`, `/health` returned 200 and `/api/prospects` initially returned `[]`.
+- Browser tab was opened at `http://localhost:3001/`; the browser rendered the app at an observed `494x707` viewport.
+- Same-runtime proof failed: before the shell API demo request, the browser showed one persisted demo prospect and `proposal ready`, while shell `/api/prospects` returned empty. After a shell-created demo, shell state became one `audited` demo prospect but browser still showed the stale `proposal ready` row. The browser was therefore not connected to the same server/database namespace.
+- Exact `1440x900`, `768x1024`, and `390x844` viewports could not be set with the supported browser controls. DevTools Console/Network inspection is not exposed by the available tool surface.
+- Demo, preview, proposal, print, invalid-live, and localhost workflows were not claimed as browser passes because the browser runtime/data mismatch invalidated the end-to-end evidence. Equivalent isolated worker API checks remain covered by Phase 1/Phase 2 tests.
+- No application defect was fixed in this attempt; the reproducible blocker is the browser/worker namespace mismatch plus unavailable exact viewport and DevTools controls.
