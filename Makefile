@@ -4,7 +4,7 @@ install:
 	npm ci
 
 test:
-	npm run typecheck && npm test
+	npm run typecheck && npm test && npm run test:frontend
 
 build:
 	npm run build

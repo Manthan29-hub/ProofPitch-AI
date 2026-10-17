@@ -1,6 +1,6 @@
 {
-  "name": "proofpitch-ai-backend", "private": true, "type": "module", "engines": {"node": ">=20"},
-  "scripts": {"dev": "tsx src/server/index.ts", "start": "node dist/src/server/index.js", "build": "tsc -p tsconfig.json", "test": "tsx --test test/**/*.test.ts", "typecheck": "tsc --noEmit"},
+  "name": "proofpitch-ai-backend", "private": true, "type": "module", "engines": {"node": "22.22.3"},
+  "scripts": {"dev": "tsx src/server/index.ts", "start": "node dist/src/server/index.js", "build": "tsc -p tsconfig.json", "test": "tsx --test test/**/*.test.ts", "test:frontend": "node --check public/app.js", "provision:owner": "tsx src/server/provision-owner.ts", "db:backup": "tsx src/server/db-tool.ts backup", "db:restore": "tsx src/server/db-tool.ts restore", "typecheck": "tsc --noEmit"},
   "dependencies": {"better-sqlite3": "^11.8.1"},
   "devDependencies": {"@types/better-sqlite3": "^7.6.12", "@types/node": "^22.10.2", "tsx": "^4.19.2", "typescript": "^5.7.2"}
 }

@@ -14,7 +14,7 @@
 
 ## Actual verification results
 - `npm ci` — passed on Linux; 46 packages audited, 0 vulnerabilities reported.
-- Supported runtime documented as Node.js 22.23.0; Node.js 24 is not claimed supported because `better-sqlite3` is native.
+- Supported runtime documented as Node.js 22.22.3; Node.js 24 is not claimed supported because `better-sqlite3` is native.
 - `npm ci` — passed on Linux; 46 packages installed/audited.
 - `make test` — passed: TypeScript typecheck plus 14 offline Node tests.
 - `make build` — passed: production TypeScript compilation.
@@ -40,7 +40,7 @@
 - Public GitHub repository: https://github.com/Manthan29-hub/ProofPitch-AI
 - CI run 38935408411 passed tests, production build, Docker image build, complete tests inside `--network none`, and an internal offline container health check.
 - Local Docker CLI is unavailable, but Docker verification completed successfully on the GitHub-hosted Linux runner.
-- Authentication, team workspaces, branded white-label output, and payment infrastructure are intentionally outside this offline MVP.
+- Branded white-label output, payment infrastructure, password recovery, MFA, SSO and invitations remain intentionally outside this local MVP.
 
 ## Current flow verification
 - Explicit demo audit → evidence inspector → local missing-meta-description preview and re-check → selected prospect proposal → in-page print view are implemented and API-smoke-tested.
@@ -57,7 +57,7 @@
 - Reproducible source fixes made during QA: removed external Google Fonts requests for offline cleanliness, made demo URL validation conditional, cleared static placeholder prospect rows, fixed tablet evidence grid behavior, fixed Escape print cleanup, and corrected table markup.
 
 ## Runtime and release notes
-- Windows setup now documents nvm-windows, exact Node.js 22.23.0 selection, clean `npm ci`, and native `better-sqlite3` troubleshooting.
+- Windows setup now documents nvm-windows, exact Node.js 22.22.3 selection, clean `npm ci`, and native `better-sqlite3` troubleshooting.
 - No dependency versions were changed.
 - Added deterministic coverage for fetch timeout, declared response size, content type, and redirect limits.
 - Phase 2 production transport now pins the validated DNS address through the Node HTTP(S) lookup callback while preserving the original hostname for Host/SNI; redirects repeat validation. The test-only injected fetch seam does not model socket pinning.
@@ -112,4 +112,91 @@
 - Audit rate limiting applies to both audit endpoints and refuses new client keys when the 10,000-entry in-memory table remains full after pruning expired entries.
 - Address checks additionally block IPv4 192.88.99.0/24 and IPv6 100::/64, 2001:db8::/32, and 64:ff9b::/32.
 - Four regression tests were added; all 18 tests pass, as do TypeScript typecheck, production build, frontend syntax, and diff checks.
-- Docker verification remains blocked: Docker CLI 29.8.1 is installed, but the Docker Desktop Linux Engine named pipe is unavailable.
+- Earlier Docker verification was blocked while Docker Desktop was stopped; the current finalisation run started the engine and verified the image, offline suite and internal health.
+
+## Phase 3 prospect workflow (2026-10-17)
+
+- Prospect list and detail responses now include valid next pipeline stages and the latest saved audit context, including explicit live/demo provenance.
+- The dashboard restores the selected prospect after refresh, reloads its evidence when selection changes, and shows distinct loading, empty, partial-data, and error states.
+- Pipeline stage actions now use the server's transition rules and persist through the existing status endpoint; invalid transitions remain rejected.
+- Prospect creation now deduplicates normalized websites, PATCH validates allowed fields and public websites, and missing audit resources return 404 rather than an ambiguous null response.
+- Proposal generation always uses the latest saved audit context instead of stale saved proposal JSON, and the UI labels the selected prospect and proposal provenance.
+- Added regression coverage for context/transition responses, prospect deduplication and PATCH validation, and latest-audit proposal context. Total offline tests: 21.
+- Local verification passed with Node.js 22.22.3: `npm run typecheck`, `npm test`, `npm run build`, `node --check public/app.js`, and `git diff --check`. The Windows shell did not provide `make`, so the documented `make test` target was verified through its equivalent npm commands rather than invoked directly.
+- No browser QA, commit, push, deployment, production database, or real customer website access was performed for this phase.
+
+## Continuous completion checkpoint: Phases 1–8 (2026-10-17)
+
+### Phase 1 — Core audit workflow
+
+- **Implementation:** Complete. Deterministic audit, explicit named demo fixture, evidence inspector, bounded local preview, proposal print view, and pipeline foundation remain intact.
+- **Verification:** Complete through local Playwright at 1440×900, 768×1024, and 390×844, plus the existing browser QA artifact. Native OS print dialog is not claimed.
+
+### Phase 2 — Security and reliability
+
+- **Implementation:** Complete. Public URL validation, private/reserved/mapped/mixed DNS rejection, validated redirects, pinned transport, DNS-inclusive deadlines, response limits, and bounded audit rate limits are preserved.
+- **Verification:** Complete in the offline Node suite and Docker network-disabled suite. No live customer site was contacted.
+
+### Phase 3 — Prospect and pipeline workflow
+
+- **Implementation:** Complete. Selection persistence, latest audit context, provenance, valid next stages, stage controls, deduplication, PATCH validation, 404s, and latest-audit proposals are integrated with the authenticated workspace.
+- **Verification:** Complete in backend tests and browser journeys, including refresh persistence and invalid transition rejection.
+
+### Phase 4 — Analytics and proof library
+
+- **Implementation:** Complete. Ordered SQLite migrations now persist audit-linked proof records, local re-check metadata, proposal revisions, and real/demo analytics. Demo-only records are excluded from real prospect, audit, proposal, and win-rate metrics. Proof search and provenance filtering are connected to the dashboard.
+- **Verification:** Complete in backend persistence/API tests and browser proof-library smoke. Analytics range metadata is explicit and timestamps are stored in UTC.
+
+### Phase 5 — Workspace and access protection
+
+- **Implementation:** Complete for the local MVP. First-run owner bootstrap, salted scrypt passwords, opaque hashed session cookies, seven-day expiry, logout revocation, login rate limiting, same-origin mutation checks, workspace memberships, viewer write protection, and server-side ownership scoping are implemented. Legacy unowned data fails closed at bootstrap.
+- **Verification:** Complete for anonymous denial, login/logout, session-backed access, cross-workspace isolation, CSRF/origin rejection, migration behavior, and Docker execution. Password reset, MFA, SSO, invitations, and public signup remain intentionally out of scope.
+
+### Phase 6 — Proposal quality and complete product UX
+
+- **Implementation:** Complete for the supported workflow. Proposals include finding, evidence source, bounded scope, next step, audit ID, revision, role/goal context, and provenance. GET proposal is side-effect-free; POST saves explicitly. Stale selection races are guarded, failed audits clear dependent state, controls are keyboard-labelled, modal/proposal focus behavior and Escape cleanup are implemented, and fabricated metrics/controls are removed or labelled unavailable.
+- **Verification:** Complete through frontend syntax checks and Playwright journeys. The invalid live URL browser response is an intentional HTTP 400 negative case.
+
+### Phase 7 — Docker, CI, reproducibility, and release preparation
+
+- **Implementation:** Complete. Node.js 22.22.3 is aligned across `.nvmrc`, package engines, Docker, README, and CI. Docker creates `/app/data`, uses a volume, and has an exact runtime tag. `make test` includes frontend syntax. QA report, demo script, and submission draft are included.
+- **Verification:** Complete locally: Docker Desktop Linux engine started successfully; image build passed; 21 tests passed with `--network none`; an isolated container health check returned `{"ok":true}`. No remote CI claim is made for this dirty working tree.
+
+### Phase 8 — Consolidated integration and final QA
+
+- **Implementation:** Complete for the authorized local scope. The issue ledger is represented by the fixed defects and documented limitations in `QA_REPORT.md`; no reset, push, deployment, or sibling-project edit occurred.
+- **Verification:** Complete for the mandatory local gates and required browser viewport matrix. The built-in browser timed out on localhost, so supported local Playwright/Chrome was used instead. Native OS print output and external live-site smoke remain unclaimed.
+
+## Final local gate
+
+- `npm run typecheck` — passed.
+- `npm test` — passed: 21 tests.
+- `npm run build` — passed.
+- `npm run test:frontend` / `node --check public/app.js` — passed.
+- `git diff --check` — passed.
+- `docker info` — passed after starting Docker Desktop.
+- `docker build --tag proofpitch-ai:phase8 .` — passed.
+- `docker run --rm --network none proofpitch-ai:phase8 npm test` — passed: 21 tests.
+- Internal `docker exec` health check — passed: `{"ok":true}`.
+- Playwright browser journeys — passed at 1440×900, 768×1024, and 390×844 with no horizontal overflow and no unexpected positive-flow console/request failures.
+
+## Finalisation release review (2026-10-17)
+
+- Added operator-only production provisioning (`npm run provision:owner`), explicit production bootstrap rejection, bounded asynchronous login verification, resilient cookies, independent login throttles, JSON media-type checks, canonical-origin-aware mutation checks, private response `no-store`, generic unexpected-error handling, and graceful shutdown.
+- Added additive migration 3 for immutable `proposal_revisions` and persisted `improvement_concepts`. Proposal GET and print remain side-effect-free; each explicit save creates a historical revision with audit, workspace, prospect and quotation context.
+- Added the visible local improvement concept and an editable quotation workflow with ISO currency, 1–10 bounded line items, integer minor-unit totals, deliverables, exclusions, timeline and next step. Saved proposal print output uses the exact saved revision.
+- Added SQLite online backup/restore tooling with integrity and foreign-key verification, a non-root Docker runtime, a container health check, `/app/data` volume support, `DEPLOYMENT.md`, and `COMMERCIAL_PLAN.md`.
+- Final host suite: 34 tests passed; typecheck, build, frontend syntax and diff checks passed. Final local Playwright run passed bootstrap, demo audit, concept, quotation save, proposal print, refresh and responsive overflow checks at 1440×900, 768×1024 and 390×844.
+- Backup and restore rehearsal passed against disposable files, preserving one owner, one prospect and one proposal revision. Final Docker image `proofpitch-ai:finalisation` passed the network-disabled 34-test suite and internal health as the non-root `node` user.
+- No push, deployment, contest submission, customer contact or production data access occurred.
+
+
+## Independent finalisation review (2026-10-17)
+
+Reproduced seven regressions before repair: malformed-cookie failure, concurrent first-owner claims, login throttling bypass through varying accounts, proof detail disappearing outside the latest 200 records, preview rechecks crossing workspace/finding boundaries, stale proposal reads after a newer audit, and named demo data attaching to a real prospect. Repaired those paths and added bounded limiter capacity coverage.
+
+Verified after the source repairs: typecheck, all 29 tests, production build, frontend syntax, and diff whitespace. Rebuilt proofpitch-ai:review; all 29 tests passed with --network none and internal health returned {"ok":true}. The isolated review container was removed. This is local Docker evidence, not remote CI. No new browser journey is claimed.
+
+Corrected the README network-disabled/published-port example and clarified that .env is not automatically loaded. Existing pending work was preserved. No commit, push, public deployment, customer contact, or production database access occurred.
+
+Open release requirements: operator-only production owner provisioning, trusted deployment origin/proxy policy, consistent backup/restore and volume-restart checks, a usable itemised quotation, bounded visual landing-page preview, immutable proposal history if revisions are advertised, and final browser/clean-clone CI evidence. Local MVP completion does not mean public release readiness.
