@@ -104,3 +104,12 @@
 - Windows npm ci restored platform-local command shims after tsx/tsc were unavailable. Then 14 tests, typecheck, build, frontend syntax, inline QA-script syntax, and diff check passed.
 - Phase 1 functional and responsive application QA is complete using the above diagnostics. Native OS print dialog/output, physical devices, and top-level device emulation were not tested or claimed. Earlier blocker entries remain as historical attempts and are superseded for the checks verified here.
 - No customer website/data, production database, push or deployment used.
+
+## Phase 2 follow-up gaps closed (2026-10-17)
+
+- Pinned HTTP transport now supports the Node lookup callback contract for both scalar and all-address lookups; a local HTTP fixture exercises the production transport.
+- The audit request deadline now includes initial and redirect DNS resolution.
+- Audit rate limiting applies to both audit endpoints and refuses new client keys when the 10,000-entry in-memory table remains full after pruning expired entries.
+- Address checks additionally block IPv4 192.88.99.0/24 and IPv6 100::/64, 2001:db8::/32, and 64:ff9b::/32.
+- Four regression tests were added; all 18 tests pass, as do TypeScript typecheck, production build, frontend syntax, and diff checks.
+- Docker verification remains blocked: Docker CLI 29.8.1 is installed, but the Docker Desktop Linux Engine named pipe is unavailable.
