@@ -20,7 +20,7 @@ jobs:
       - name: Build Docker image
         run: docker build --tag proofpitch-ai:ci .
       - name: Run complete tests in offline container
-         run: docker run --rm --network none -e NODE_ENV=development proofpitch-ai:ci npm test
+        run: docker run --rm --network none -e NODE_ENV=development proofpitch-ai:ci npm test
       - name: Run offline container smoke test
         run: |
           docker run --detach --network none --name proofpitch-ci proofpitch-ai:ci
