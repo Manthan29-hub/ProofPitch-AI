@@ -3,7 +3,7 @@
 ## Revision and environment
 
 - Repository: `C:\Users\manth\OneDrive\Desktop\ProofPitch-AI`
-- Source identity: `master` at `133bb9e` plus the uncommitted working-tree patch listed by `git status`.
+- Source identity: finalisation candidate commit `2ef87e6` on `master`; branch remains six commits ahead of `origin/master`.
 - Runtime: Node.js `v22.22.3` portable Windows runtime; Docker image runtime Node.js `v22.22.3`.
 - Database: disposable QA database outside the repository at `C:\Users\manth\AppData\Local\Temp\omnirush\proofpitch-final-ui.sqlite`.
 - Browser base URL: `http://127.0.0.1:4321/`.

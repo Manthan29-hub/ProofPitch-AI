@@ -182,6 +182,7 @@
 
 ## Finalisation release review (2026-10-17)
 
+- Candidate commit: `2ef87e6` (`feat: finalise evidence-backed proposal workflow`).
 - Added operator-only production provisioning (`npm run provision:owner`), explicit production bootstrap rejection, bounded asynchronous login verification, resilient cookies, independent login throttles, JSON media-type checks, canonical-origin-aware mutation checks, private response `no-store`, generic unexpected-error handling, and graceful shutdown.
 - Added additive migration 3 for immutable `proposal_revisions` and persisted `improvement_concepts`. Proposal GET and print remain side-effect-free; each explicit save creates a historical revision with audit, workspace, prospect and quotation context.
 - Added the visible local improvement concept and an editable quotation workflow with ISO currency, 1–10 bounded line items, integer minor-unit totals, deliverables, exclusions, timeline and next step. Saved proposal print output uses the exact saved revision.
