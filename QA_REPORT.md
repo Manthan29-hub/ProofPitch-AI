@@ -53,6 +53,14 @@ Passed journeys:
 
 The invalid localhost request intentionally produced HTTP 400 and a browser console resource message; it is classified as an expected negative-test response, not an application failure.
 
+## Forwarded-origin follow-up (2026-10-18)
+
+- Added `codespacesForwardedOrigin` validation and route-level coverage for GitHub Codespaces development origins. The application accepts only the exact environment-derived origin and rejects an unrelated attacker origin; production does not derive the exception.
+- Host verification passed after the change: typecheck, 39 offline tests, production build, frontend syntax, and `git diff --check`.
+- Docker image build, network-disabled 39-test run, and non-root `/health` check passed.
+- Disposable API smoke passed bootstrap/login, explicit demo audit, workspace marker persistence, authenticated prospect creation, attacker-origin rejection, and logout. Backup and restore passed SQLite integrity and foreign-key checks.
+- The built-in browser required a sign-in handoff for the localhost tab during this follow-up. No new browser viewport or screenshot evidence is claimed; the existing Playwright evidence above remains the supported browser record.
+
 ## Known limitations
 
 - Native OS print dialog and physical PDF output were not inspected; only the in-page print view and print-media CSS were observed.

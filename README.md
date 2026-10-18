@@ -53,6 +53,8 @@ First-owner bootstrap is atomic and is available only when the database has no u
 
 This MVP does not implement email verification, password reset, MFA, SSO, public signup, invitations, or payment processing. Do not expose a deployment publicly until an operator has configured HTTPS, `APP_ORIGIN`, `COOKIE_SECURE=true`, and an explicit legacy-data migration policy. In production, missing or wrong Origin headers are rejected for cookie-authenticated mutations. Local development permits missing Origin only when no production origin is configured. Existing databases containing prospects but no users fail closed at bootstrap; make a disposable copy and assign ownership deliberately before using them.
 
+For GitHub Codespaces development, the server derives the exact forwarded origin only when `CODESPACES=true`, `CODESPACE_NAME`, `GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN`, and a valid `PORT` are present. This development-only exception is matched exactly for bootstrap, login, logout, and authenticated writes; production never derives or trusts a Codespaces origin. Arbitrary forwarded headers are not trusted.
+
 ## Configuration
 
 `.env.example` documents configuration names. Current scripts do not load `.env` automatically; set variables in the process or container environment before startup. In PowerShell, use `$env:PORT="3000"` and `$env:DATABASE_PATH="./proofpitch.sqlite"`. The default SQLite file is local and ignored by git. Never commit credentials.

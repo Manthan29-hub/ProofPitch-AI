@@ -191,6 +191,15 @@
 - Backup and restore rehearsal passed against disposable files, preserving one owner, one prospect and one proposal revision. Final Docker image `proofpitch-ai:finalisation` passed the network-disabled 34-test suite and internal health as the non-root `node` user.
 - No push, deployment, contest submission, customer contact or production data access occurred.
 
+## Forwarded-origin follow-up (2026-10-18)
+
+- Added a development-only GitHub Codespaces origin derivation from validated environment values; production and ordinary local development never derive this exception.
+- Wired the same policy through bootstrap, login, logout, and authenticated write routes, with an application-level regression test that accepts the exact forwarded origin and rejects an attacker origin.
+- Final host gate passed: `npm run typecheck`, `npm test` (39 tests), `npm run build`, `npm run test:frontend`, `node --check public/app.js`, and `git diff --check`.
+- Final Docker verification passed: image build, `docker run --rm --network none ... npm test` (39 tests), and non-root internal `/health` returned `{"ok":true}`.
+- Disposable API smoke passed against an isolated database: bootstrap/login, workspace identity marker, explicit demo audit, authenticated prospect creation, attacker-origin rejection (`403`), and logout. SQLite online backup and restore both passed integrity and foreign-key verification.
+- The built-in browser required a sign-in handoff for localhost, so no new browser screenshot/viewport evidence is claimed for this follow-up. Existing Playwright/browser evidence remains historical and is documented above.
+
 
 ## Independent finalisation review (2026-10-17)
 
