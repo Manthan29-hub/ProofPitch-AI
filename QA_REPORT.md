@@ -2,7 +2,7 @@
 
 ## Revision and environment
 
-- Repository: `C:\Users\manth\OneDrive\Desktop\ProofPitch-AI`
+- Repository: the ProofPitch AI project repository
 - Source identity: finalisation candidate commit `2ef87e6` on `master`; branch remains six commits ahead of `origin/master`.
 - Runtime: Node.js `v22.22.3` portable Windows runtime; Docker image runtime Node.js `v22.22.3`.
 - Database: disposable QA database kept outside the repository in a local temporary directory.
