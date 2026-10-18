@@ -34,14 +34,52 @@ export function resolveAuth(store: Store, req: http.IncomingMessage): AuthContex
   return { session, user, workspaceId: session.workspaceId, role: membership.role };
 }
 
-export function checkOrigin(req: http.IncomingMessage, configuredOrigin?: string, required = false) {
+export function codespacesForwardedOrigin(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  if (env.NODE_ENV === "production" || env.CODESPACES !== "true") return undefined;
+  const name = env.CODESPACE_NAME;
+  const domain = env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN;
+  const port = Number(env.PORT ?? "3000");
+  const validLabel = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i;
+  if (
+    !name ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(name) ||
+    !domain ||
+    domain.length > 253 ||
+    !domain.split(".").every((label) => validLabel.test(label)) ||
+    !Number.isInteger(port) ||
+    port < 1 ||
+    port > 65535
+  ) return undefined;
+
+  const host = `${name}-${port}.${domain}`;
+  if (host.length > 253) return undefined;
+  return `https://${host}`;
+}
+
+export function checkOrigin(
+  req: http.IncomingMessage,
+  configuredOrigin?: string,
+  required = false,
+  env: NodeJS.ProcessEnv = process.env,
+) {
   const origin = req.headers.origin;
   if (!origin) return !required;
   try {
-    const expected = configuredOrigin ? new URL(configuredOrigin) : new URL(`http://${req.headers.host || "localhost"}`);
     const parsed = new URL(origin);
-    return parsed.protocol === expected.protocol && parsed.host === expected.host;
-  } catch { return false; }
+    const candidates = configuredOrigin
+      ? [configuredOrigin]
+      : [`http://${req.headers.host || "localhost"}`];
+    const forwardedOrigin = codespacesForwardedOrigin(env);
+    if (forwardedOrigin) candidates.push(forwardedOrigin);
+    return candidates.some((candidate) => {
+      try {
+        return new URL(candidate).origin === parsed.origin;
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return false;
+  }
 }
-
 export function secureCookies() { return process.env.NODE_ENV === "production" || process.env.COOKIE_SECURE === "true"; }
