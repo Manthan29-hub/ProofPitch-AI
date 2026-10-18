@@ -18,7 +18,7 @@ Checked on 2026-10-18 from the rendered Unstop listing: https://unstop.com/hacka
 - **Participation:** Individual participation is shown.
 - **Visible timeline:** 14 Oct 2026, 11:00 PM IST → 21 Oct 2026, 12:00 AM IST.
 - **Final submission:** The visible stage is **Final Submission**, marked live, with submission through the Unstop platform. The page does not show a separate registration-deadline field in the rendered content.
-- **Visible account state:** The page shows a generic competition count of 2,452 registered and still shows a `Register` control. This does not establish the current user's registration state.
+- **Visible account state:** After completing the form in the browser, Unstop displayed **Registration Successful** for Omnirush Agentic Buildathon 2026. The account is now visibly registered.
 - **Participation flow:** The listing says to register on Unstop, install OmniRush, sign in with the registered email to activate tokens and the countdown, select a track, build, submit through the OmniRush dashboard to generate an `OFB-XXXXXX` Submission ID, and enter that ID in the Unstop submission.
 - **Track visible on the page:** `Agents & Automation`.
 - **Tooling visible on the page:** The listing advertises GPT-6 Astra tokens, access to GPT-6 models, and OmniRush sub-agents. The rendered listing did not display a separate exclusivity clause for other tools, so this draft does not make an unsupported exclusivity claim. The organizer permission supplied for this work allows OmniRush-native tools; retain that exact factual basis for any attestation.
