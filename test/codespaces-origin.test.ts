@@ -54,9 +54,12 @@ test("the application routes use the same trusted Codespaces origin policy", asy
     const bootstrap = await fetch(base + "/api/auth/bootstrap", { method: "POST", headers, body: JSON.stringify({ email: "codespaces@example.test", displayName: "Codespaces", password: "correct horse battery" }) });
     assert.equal(bootstrap.status, 201);
     const cookie = bootstrap.headers.get("set-cookie")!.split(";", 1)[0];
-    const accepted = await fetch(base + "/api/prospects", { method: "POST", headers: { ...headers, cookie }, body: JSON.stringify({ name: "Origin test", website: "https://example.com" }) });
-    assert.equal(accepted.status, 201);
-    const rejected = await fetch(base + "/api/prospects", { method: "POST", headers: { ...headers, origin: "https://attacker.example", cookie }, body: JSON.stringify({ name: "Should fail", website: "https://another.example" }) });
+    const demo = await fetch(base + "/api/audits", { method: "POST", headers: { ...headers, cookie }, body: JSON.stringify({ demo: true }) });
+    assert.equal(demo.status, 201);
+    const demoBody = await demo.json() as { prospect: { id: string } };
+    const accepted = await fetch(base + `/api/prospects/${demoBody.prospect.id}`, { method: "PATCH", headers: { ...headers, cookie }, body: JSON.stringify({ name: "Origin test" }) });
+    assert.equal(accepted.status, 200);
+    const rejected = await fetch(base + `/api/prospects/${demoBody.prospect.id}`, { method: "PATCH", headers: { ...headers, origin: "https://attacker.example", cookie }, body: JSON.stringify({ name: "Should fail" }) });
     assert.equal(rejected.status, 403);
   } finally {
     await new Promise<void>(resolve => server.close(() => resolve()));
