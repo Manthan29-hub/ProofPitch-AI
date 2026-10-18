@@ -1,45 +1,66 @@
-# ProofPitch AI · submission draft
+# ProofPitch AI · final submission draft
 
-## Project description
+## Submission fields
 
-ProofPitch AI is an offline-friendly, authenticated revenue workspace for small web agencies. It turns observable website HTML findings into an inspectable proof library, a bounded local preview, a deterministic proposal, and a server-enforced prospect pipeline.
+- **Project title:** ProofPitch AI — Evidence to Proposal Workspace
+- **One-line description:** Turn observable website findings into a provenance-aware, evidence-backed proposal without losing the audit context.
+- **Target user:** Freelancers and small web agencies selling website improvement work.
+- **Public repository:** https://github.com/Manthan29-hub/ProofPitch-AI
+- **README/setup:** The repository README contains Node.js 22.22.3 setup, `npm ci`, `make test`, `make build`, Docker, authentication, backup/restore, and production limitations.
+- **Demo video:** **Pending — no recording or shareable link exists yet.** Do not submit a placeholder URL.
+- **Deployment:** **Not completed.** No public URL is claimed; the safe verified paths are local Docker and a temporary GitHub Codespace.
+- **OmniRush Submission ID:** **Pending official listing review / not available.**
 
-## Problem
+## Short description
 
-Small agencies often notice real website issues but lose the evidence and context between an initial audit, a sales conversation, and a proposal. Generic sales dashboards also blur demo data, guesses, and verified observations.
+ProofPitch AI is an authenticated workspace for small web agencies. It turns explicit live or named-demo website audits into inspectable evidence, a bounded local improvement preview, an editable concept and quotation, and an immutable printable proposal revision.
 
-## Solution
+## Full description
 
-ProofPitch AI stores immutable audit runs, explicit live/demo provenance, evidence-backed proof records, selected-prospect context, immutable proposal revisions, an editable local improvement concept and an operator-supplied quotation in SQLite. The core path is:
+Small agencies often identify real website problems but lose the evidence and context between an audit, a sales conversation, and a proposal. ProofPitch AI keeps those steps connected without pretending that a demo result is a live result or that a quotation is measured business impact.
 
-`explicit live/demo audit → evidence inspection → local concept → supported re-check → quotation → saved revision → printable view → pipeline stage`
+The working flow is:
 
-## Architecture
+`explicit live/demo audit → evidence inspector → local-only fix preview → improvement concept → editable quotation → saved proposal revision → print view → pipeline stage`
 
-- Node.js 22.22.3 and TypeScript HTTP server.
-- SQLite with ordered additive migrations and foreign-key enforcement.
-- Built-in Node `scrypt` password hashing and opaque hashed sessions.
-- Workspace-scoped users, memberships, prospects, audits, proofs, proposals, and sessions.
+The named offline fixture makes the demo reproducible without contacting a customer website. A live URL remains a separate path with public-URL validation, bounded fetching, redirect checks, DNS safety checks, timeouts, response limits, and visible failure behavior. The server persists audit provenance, evidence-linked proofs, prospect context, proposal inputs, and immutable revisions in SQLite.
+
+## What makes the workflow distinct
+
+The product does not stop at a generic audit report. It preserves the chain from an observable finding to a bounded local preview, an application-owned improvement concept, operator-entered quotation data, and a revision that can be printed and reviewed later. Demo provenance is visible and excluded from real-business analytics. Opening a proposal is read-only; saving creates a historical revision.
+
+## Technical architecture and reproducibility
+
+- Node.js 22.22.3, TypeScript, and a small HTTP server.
+- SQLite with ordered additive migrations, foreign-key enforcement, workspace-scoped records, and online backup/restore verification.
+- Built-in Node `scrypt` password hashing and opaque hashed session cookies.
 - Static responsive HTML/CSS/JavaScript frontend with safe text-node rendering.
-- Bounded SSRF-aware audit transport with validated DNS answers, redirects, timeouts, and response limits.
-- Offline `node:test` suite and Docker/CI verification with network-disabled tests.
+- SSRF-aware audit transport with HTTP(S)-only validation, DNS/address checks, redirect validation, deadlines, and response-size/content-type limits.
+- Reproducible Docker image running as non-root `node`, with `/app/data` volume support and `/health` check.
+- Offline test suite and CI do not require live client sites or external AI services.
 
-## Verified feature list
+Exact local verification:
 
-- Public URL validation and production pinned transport safeguards.
-- Explicit named demo fixture with persisted provenance and no live fallback.
-- Audit evidence inspector and bounded local meta-description re-check.
-- Audit-linked proof library with search and live/demo filtering.
-- Real-business analytics that exclude demo-only records.
-- Authenticated local owner bootstrap, login, logout, session expiry, CSRF/origin checks, and workspace isolation.
-- Deduplicated prospects, PATCH validation, server-enforced pipeline transitions, and selected-prospect persistence.
-- Latest-audit proposal revisions with evidence sources, scope, next step, and provenance.
-- Editable application-owned landing-page concept and bounded quotation with currency, minor-unit line items, deliverables, exclusions and timeline.
-- Explicit proposal save with immutable historical revisions and older-revision retrieval.
-- Operator-only production provisioning, online SQLite backup/restore verification, non-root Docker runtime and health check.
-- Keyboard-friendly modal/proposal/mobile navigation behavior and responsive checks at three required viewports.
-- Reproducible Node 22.22.3 Docker image, offline container suite, and internal health smoke.
+```bash
+npm ci
+make test
+make build
+docker build -t proofpitch-ai .
+docker run --rm --network none -e NODE_ENV=development proofpitch-ai npm test
+```
 
-## Honest limitations
+Latest verified state: 39 host tests passed, typecheck/build/frontend checks passed, 39 Docker network-disabled tests passed, non-root container health returned `{"ok":true}`, SQLite backup/restore passed integrity and foreign-key checks, and GitHub Actions passed at https://github.com/Manthan29-hub/ProofPitch-AI/actions/runs/39141932663.
 
-This is a local MVP rather than a complete hosted SaaS identity platform. It does not include email verification, password recovery, MFA, SSO, invitations, payment processing, public hosting/TLS automation, customer messaging, contact scraping, or live website deployment. Browser evidence covers local Chrome and print-media emulation; it does not claim native OS print-dialog or physical-device verification. Legacy databases with unowned data fail closed until an operator performs an explicit migration.
+## Honest limitations and non-claims
+
+- This is a local MVP, not a complete hosted SaaS identity platform.
+- No email verification, password reset, MFA, SSO, invitations, payments, messaging, contact scraping, or live website deployment is implemented.
+- No business impact, revenue increase, customer, testimonial, or performance claim is made.
+- No public deployment has been completed or tested.
+- Browser evidence covers the documented Playwright/Chrome viewport checks and print-media emulation; native OS print dialogs and physical devices are not claimed.
+- The current Codespaces-origin follow-up has API and CI coverage. No new browser screenshot or viewport evidence was recorded for that follow-up.
+- Legacy databases with unowned records fail closed until an operator performs an explicit migration on a disposable copy.
+
+## AI/tool-use compliance note
+
+**Do not finalize this statement until the current official listing and any organizer permission are visibly checked.** The work in this OmniRush session used OmniRush-native file, terminal, browser, web-fetch, and documentation tools; no external AI/agent product was used. The exact contest attestation, if required, must be copied from the current official rules rather than inferred from this draft.
